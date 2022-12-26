@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+double average_waiting_time;
+int total_waiting_time;
+#define MAX_PROCESS 100
 struct processes
 {
     int arrival_time;
@@ -16,6 +19,16 @@ struct times
 {
     int p, art, but, wtt, tat, rnt;
 };
+void calculate_waiting_time(struct processes p[], int n)
+{
+    int i;
+    total_waiting_time = 0;
+    p[0].waiting_time = 0;
+    for(i=1; i<n; i++) {
+        p[i].waiting_time = p[i-1].waiting_time + p[i-1].burst_time;
+        total_waiting_time += p[i].waiting_time;
+    }
+}
 void print_gantt_chart(struct processes p[], int n)
 {
     
@@ -104,14 +117,14 @@ void fcfs()
     printf("Average turnaround time : %f \n", avg_turn);
 }
 
-void sort(struct processes *p, int np)
+void sortForSJF(struct processes *p, int np)
 {
     struct processes t;
     for (int i = 0; i < np - 1; i++)
     {
         for (int j = 0; j < np - i - 1; j++)
         {
-            if (p[j + 1].burst_time < p[j].burst_time)
+            if (p[j + 1].arrival_time < p[j].arrival_time)
             {
                 t = p[j + 1];
                 p[j + 1] = p[j];
@@ -168,43 +181,31 @@ void sjf()
     printf("Enter number of processes:  ");
     scanf("%d", &no_of_processes);
     printf("############################\n");
-    struct processes *p = malloc(sizeof(struct processes) * no_of_processes);
-    for (int i = 0; i < no_of_processes; i++)
-    {
-        printf("Enter Burst time of p[%d]:  ", i);
+    
+    struct processes p[MAX_PROCESS];
+    int n, i, j;
+    puts("SHORTEST JOB FIRST SCHEDULING ALGORITHM");
+    puts("=======================================");
+
+    printf("Enter total process: ");
+    scanf("%d", &n);
+    printf("Enter burst time for each process:\n");
+    for(i=0; i<n; i++) {
+        printf("P[%d]: ", i+1);
         scanf("%d", &p[i].burst_time);
-        printf("Enter arrival time of p[%d]:  ", i);
-        scanf("%d", &p[i].arrival_time);
-        p[i].process_id = i;
-        printf("############################\n");
-    }
-    sort(p, no_of_processes);
-    int wait_time = 0;
-    int turn_time = 0;
-    for (int i = 0; i < no_of_processes; i++)
-    {   
         p[i].pid = i+1;
-        // printf(" %d \n",wait_time);
-        p[i].waiting_time = wait_time;
-        p[i].turnaround_time = wait_time + p[i].burst_time;
-        turn_time += p[i].turnaround_time;
-        wait_time += p[i].burst_time;
     }
-    printf("\t ProcessId \t\tArrival \t\tBurst \t\t Turnaround \t\t Waiting \n");
-    for (int i = 0; i < no_of_processes; i++)
-    {
-        printf("\t %d \t\t\t %d \t\t\t %d \t\t\t %d \t\t\t %d \n", p[i].process_id, p[i].arrival_time, p[i].burst_time, p[i].turnaround_time, p[i].waiting_time);
-    }
-    int t_time = 0;
-    for (int i = 0; i < no_of_processes; i++)
-    {
-        t_time += p[i].waiting_time;
-    }
-    float avg_wait = t_time / no_of_processes;
-    float avg_turn = turn_time / no_of_processes;
-    printf("Average waiting time : %f \n", avg_wait);
-    printf("Average turnaround time : %f \n", avg_turn);
-    print_gantt_chart(p, no_of_processes);
+
+    sortForSJF(p, n);
+    calculate_waiting_time(p, n);
+
+    average_waiting_time = (double) ( (double)total_waiting_time / (double) n );
+
+    puts("");
+    printf("Average Waiting Time: %.2lf\n",average_waiting_time);
+
+    printf("Gantt Chart:\n");
+    print_gantt_chart(p, n);
     printf("##########################################################################################################\n");
 }
 
@@ -283,7 +284,7 @@ void roundRobin()
 }
 
 
-void main()
+int main()
 {
     int choice;
     while (choice != 5)
@@ -306,6 +307,8 @@ void main()
         case 3:
             roundRobin();
             break;
+        case 4:
+            return 0;
         }
     }
 }
