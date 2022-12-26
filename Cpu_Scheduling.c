@@ -103,7 +103,7 @@ void fcfs()
     printf("Enter number of processes:  ");
     scanf("%d", &no_of_processes);
     printf("**********************************\n");
-    struct processes *p = malloc(sizeof(struct processes) * no_of_processes);
+    struct processes p[no_of_processes];
     for (int i = 0; i < no_of_processes; i++)
     {
         printf("Enter Burst time of p[%d]:  ", i);
@@ -258,7 +258,73 @@ void roundRobin()
         print_table(a);
     }
 
-    return 0;
+    return;
+}
+
+void SRTF () {
+    printf("\n---------------------------------Shortest Remaining Time First SIMULATION-------------------------------------------");
+    int a[10], b[10], x[10];
+    int waiting[10], turnaround[10], completion[10];
+    int i, j, smallest, count = 0, time, n;
+    double avg = 0, tt = 0, end;
+    printf("\nEnter the number of Processes: ");
+    scanf("%d", &n);
+    printf("\n----------------------------------------------------------------------------");
+    for (i = 0; i < n; i++)
+    {
+        printf("\nEnter arrival time of process %d (At least 0):  ", i + 1);
+        scanf("%d", &a[i]);
+    }
+    printf("\n----------------------------------------------------------------------------");
+    for (i = 0; i < n; i++)
+    {
+        printf("\nEnter burst time of process %d (max 99):  ", i + 1);
+        scanf("%d", &b[i]);
+    }
+    printf("\n----------------------------------------------------------------------------\n");
+    for (i = 0; i < n; i++)
+        x[i] = b[i];
+
+    b[9] = 100;
+    for (time = 0; count != n; time++)
+    {
+        smallest = 9;
+        for (i = 0; i < n; i++)
+        {
+            if (a[i] <= time && b[i] < b[smallest] && b[i] > 0)
+            {
+                smallest = i;
+                // printf("First: b[%d] = %d, time = %d\t\t", smallest, b[smallest], time);
+            }
+        }
+        b[smallest]--;
+        // printf("Second: b[%d] = %d, time = %d", smallest, b[smallest], time);
+        if (b[smallest] == 0)
+        {
+            count++;
+            end = time + 1;
+            completion[smallest] = end;
+            waiting[smallest] = end - a[smallest] - x[smallest];
+            turnaround[smallest] = end - a[smallest];
+        }
+    }
+
+    printf("pid \t burst \t arrival \twaiting \tturnaround \tcompletion");
+    printf("\n----------------------------------------------------------------------------");
+    for (i = 0; i < n; i++)
+    {
+        printf("\n %d \t   %d \t %d\t\t%d   \t\t%d\t\t%d", i + 1, x[i], a[i], waiting[i], turnaround[i], completion[i]);
+        printf("\n----------------------------------------------------------------------------");
+        avg = avg + waiting[i];
+        tt = tt + turnaround[i];
+    }
+
+    printf("\nWaiting Time=%lf\nTurnAround Time=   %lf", avg, tt);
+    printf("\n----------------------------------------------------------------------------");
+    printf("\nAverage waiting time = %lf\n", avg / n);
+    printf("\nAverage Turnaround time = %lf", tt / n);
+    printf("\n\n\n*******************************THE END***************************************\n");
+    return ;
 }
 
 int main()
@@ -267,10 +333,11 @@ int main()
     while (choice != 5)
     {
         printf("\t\t Main Menu \n");
-        printf("\t 1. First Come First Serve(FCFS)\n");
+        printf("\t 1. FCFS\n");
         printf("\t 2. SJF\n");
-        printf("\t 3. Round Robin\n");
-        printf("\t 4. Exit\n");
+        printf("\t 3. SRTF\n");
+        printf("\t 4. R-R\n");
+        printf("\t 5. Exit\n");
         printf("Enter choice:  ");
         scanf("%d", &choice);
         switch (choice)
@@ -282,10 +349,11 @@ int main()
             sjf();
             break;
         case 3:
-            roundRobin();
+            SRTF();
             break;
         case 4:
-            return 0;
+            roundRobin();
+            break;
         }
     }
 }
@@ -371,21 +439,3 @@ void print_table(struct Process a[])
     printf("Average Turn Around Time : %.2f\n", avg_turnarround_time);
 }
 
-/*
-void sort_rem(struct processes *p, int np)
-{
-    struct processes t;
-    for (int i = 0; i < np - 1; i++)
-    {
-        for (int j = 0; j < np - i - 1; j++)
-        {
-            if (p[j + 1].remaining_time < p[j].remaining_time)
-            {
-                t = p[j + 1];
-                p[j + 1] = p[j];
-                p[j] = t;
-            }
-        }
-    }
-}
-*/
