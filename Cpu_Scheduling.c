@@ -41,10 +41,7 @@ void calculate_waiting_time(struct processes p[], int n)
 }
 void print_gantt_chart(struct processes p[], int n)
 {
-
     int i, j;
-    int last = p[n - 1].burst_time + (n == 1 ? 0 : p[n - 1].waiting_time);
-    // printing top bar
     printf(" ");
     for (i = 0; i < n; i++)
     {
@@ -53,18 +50,19 @@ void print_gantt_chart(struct processes p[], int n)
         printf(" ");
     }
     printf("\n|");
-    // middle position
+
+    // printing process id in the middle
     for (i = 0; i < n; i++)
     {
         for (j = 0; j < p[i].burst_time - 1; j++)
             printf(" ");
-        printf("p%d", p[i].pid);
+        printf("P%d", p[i].process_id);
         for (j = 0; j < p[i].burst_time - 1; j++)
             printf(" ");
         printf("|");
     }
     printf("\n ");
-    // bottom bar
+    // printing bottom bar
     for (i = 0; i < n; i++)
     {
         for (j = 0; j < p[i].burst_time; j++)
@@ -73,27 +71,19 @@ void print_gantt_chart(struct processes p[], int n)
     }
     printf("\n");
 
-    // printing waiting time
-    int minus = 0;
+    // printing the time line
+    printf("0");
     for (i = 0; i < n; i++)
     {
-        if (p[i].waiting_time > 9)
-            printf(" ");
-        printf("%d", p[i].waiting_time);
-        if (p[i + 1].waiting_time > 9)
-        {
-            minus = 1;
-        }
-        if (i + 1 == n)
-            if (last > 9)
-                minus = 1;
-        for (j = 0; j < p[i].burst_time - minus; j++)
+        for (j = 0; j < p[i].burst_time; j++)
             printf("  ");
+        if (p[i].turnaround_time > 9)
+            printf("\b"); // backspace : remove 1 space
+        printf("%d", p[i].turnaround_time);
     }
-    if (last > 9)
-        printf(" ");
-    printf("%d\n", last);
+    printf("\n");
 }
+
 
 void fcfs()
 {
@@ -103,7 +93,7 @@ void fcfs()
     printf("Enter number of processes:  ");
     scanf("%d", &no_of_processes);
     printf("**********************************\n");
-    struct processes p[no_of_processes];
+    struct processes *p = malloc(sizeof(struct processes) * no_of_processes);
     for (int i = 0; i < no_of_processes; i++)
     {
         printf("Enter Burst time of p[%d]:  ", i);
@@ -138,6 +128,7 @@ void fcfs()
     float avg_turn = turn_time / no_of_processes;
     printf("Average waiting time : %f \n", avg_wait);
     printf("Average turnaround time : %f \n", avg_turn);
+    print_gantt_chart(p, no_of_processes);
 }
 
 void sortForSJF(struct processes *p, int np)
