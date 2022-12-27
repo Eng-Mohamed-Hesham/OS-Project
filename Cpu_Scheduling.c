@@ -41,49 +41,79 @@ void calculate_waiting_time(struct processes p[], int n)
 }
 void print_gantt_chart(struct processes p[], int n)
 {
+    
     int i, j;
+    int last = p[n-1].burst_time + ( n== 1 ? 0 : p[n-1].waiting_time);
+    // printing top bar
     printf(" ");
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < p[i].burst_time; j++)
-            printf("--");
+    for(i=0; i<n; i++) {
+        for(j=0; j<p[i].burst_time; j++) printf("--");
         printf(" ");
     }
     printf("\n|");
-
-    // printing process id in the middle
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < p[i].burst_time - 1; j++)
-            printf(" ");
-        printf("P%d", p[i].process_id);
-        for (j = 0; j < p[i].burst_time - 1; j++)
-            printf(" ");
+    // middle position
+    for(i=0; i<n; i++) {
+        for(j=0; j<p[i].burst_time-1; j++) printf(" ");
+        printf("p%d", p[i].pid);
+        for(j=0; j<p[i].burst_time-1; j++) printf(" ");
         printf("|");
     }
     printf("\n ");
-    // printing bottom bar
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < p[i].burst_time; j++)
-            printf("--");
+    // bottom bar
+    for(i=0; i<n; i++) {
+        for(j=0; j<p[i].burst_time; j++) printf("--");
         printf(" ");
     }
     printf("\n");
 
-    // printing the time line
-    printf("0");
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < p[i].burst_time; j++)
-            printf("  ");
-        if (p[i].turnaround_time > 9)
-            printf("\b"); // backspace : remove 1 space
-        printf("%d", p[i].turnaround_time);
+    // printing waiting time
+    int minus = 0;
+    for(i=0; i<n; i++) {
+        if(p[i].waiting_time>9) printf(" ");
+        printf("%d", p[i].waiting_time);
+        if(p[i+1].waiting_time>9){
+          minus = 1;
+        }
+        if(i+1 == n )  if (last>9) minus = 1;
+        for(j=0; j<p[i].burst_time-minus; j++) printf("  ");
+
     }
-    printf("\n");
+    if(last>9) printf(" ");
+    printf("%d\n", last);
+}
+void sortForSJF(struct processes *p, int np)
+{
+    struct processes t;
+    for (int i = 0; i < np - 1; i++)
+    {
+        for (int j = 0; j < np - i - 1; j++)
+        {
+            if (p[j + 1].burst_time < p[j].burst_time)
+            {
+                t = p[j + 1];
+                p[j + 1] = p[j];
+                p[j] = t;
+            }
+        }
+    }
 }
 
+void SortForFCFS(struct processes p[], int np)
+{
+    struct processes t;
+    for (int i = 0; i < np - 1; i++)
+    {
+        for (int j = 0; j < np - i - 1; j++)
+        {
+            if (p[j + 1].arrival_time < p[j].arrival_time)
+            {
+                t = p[j + 1];
+                p[j + 1] = p[j];
+                p[j] = t;
+            }
+        }
+    }
+}
 
 void fcfs()
 {
@@ -100,14 +130,15 @@ void fcfs()
         scanf("%d", &p[i].burst_time);
         printf("Enter arrival time of p[%d]:  ", i);
         scanf("%d", &p[i].arrival_time);
-        p[i].process_id = i;
+        p[i].pid = i;
         printf("**********************************\n");
     }
     int wait_time = 0;
     int turn_time = 0;
+    SortForFCFS(p, no_of_processes);
     for (int i = 0; i < no_of_processes; i++)
     {
-
+        
         // printf(" %d \n",wait_time);
         p[i].waiting_time = wait_time;
         p[i].turnaround_time = wait_time + p[i].burst_time;
@@ -131,51 +162,10 @@ void fcfs()
     print_gantt_chart(p, no_of_processes);
 }
 
-void sortForSJF(struct processes *p, int np)
-{
-    struct processes t;
-    for (int i = 0; i < np - 1; i++)
-    {
-        for (int j = 0; j < np - i - 1; j++)
-        {
-            if (p[j + 1].arrival_time < p[j].arrival_time)
-            {
-                t = p[j + 1];
-                p[j + 1] = p[j];
-                p[j] = t;
-            }
-        }
-    }
-}
 
-void sortart(struct times a[], int pro)
-{
-    int i, j;
-    struct times temp;
-    for (i = 0; i < pro; i++)
-    {
-        for (j = i + 1; j < pro; j++)
-        {
-            if (a[i].art > a[j].art)
-            {
-                temp = a[i];
-                a[i] = a[j];
-                a[j] = temp;
-            }
-        }
-    }
-    return;
-}
 
 void sjf()
 {
-    int no_of_processes;
-    printf("\nShortest Job First Algorithm\n");
-    printf("Note -\n1. Arrival Time of at least on process should be 0\n2. CPU should never be idle\n");
-    printf("Enter number of processes:  ");
-    scanf("%d", &no_of_processes);
-    printf("**************************************\n");
-
     struct processes p[MAX_PROCESS];
     int n, i, j;
     puts("SHORTEST JOB FIRST SCHEDULING ALGORITHM");
