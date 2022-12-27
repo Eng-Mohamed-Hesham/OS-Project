@@ -48,21 +48,6 @@ void print_gantt_chart(struct process p[], int n)
         printf(" ");
     }
     printf("\n");
-
-    // printing waiting time
-    int minus = 0;
-    for(i=0; i<n; i++) {
-        if(p[i].WT>9) printf(" ");
-        printf("%d", p[i].WT);
-        if(p[i+1].WT>9){
-          minus = 1;
-        }
-        if(i+1 == n )  if (last>9) minus = 1;
-        for(j=0; j<p[i].BT-minus; j++) printf("  ");
-
-    }
-    if(last>9) printf(" ");
-    printf("%d\n", last);
 }
 
 int main()
