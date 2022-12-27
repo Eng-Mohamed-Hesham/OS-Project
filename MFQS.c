@@ -75,7 +75,7 @@ int main()
     for (i = 0; i < n; i++, c++, proid++)
     {
         Q1[i].pid = proid;
-        printf("\nEnter the arrival time and burst time of process P%c: ", Q1[i].pid);
+        printf("\nEnter the arrival time and burst time of process P%d: ", Q1[i].pid);
         scanf("%d%d", &Q1[i].AT, &Q1[i].BT);
         Q1[i].RT = Q1[i].BT;
     }
