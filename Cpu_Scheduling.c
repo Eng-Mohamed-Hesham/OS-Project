@@ -18,10 +18,6 @@ struct Process
 {
     int pid, arrival_time, burrst_time, waiting_time, turn_around_time, run_time;
 };
-struct times
-{
-    int p, art, but, wtt, tat, rnt;
-};
 int num_process, remain, flag = 0, ts, choice, i;
 float avg_waiting_time = 0, avg_turnarround_time = 0;
 
@@ -66,20 +62,6 @@ void print_gantt_chart(struct processes p[], int n)
     }
     printf("\n");
 
-    // printing waiting time
-    int minus = 0;
-    for(i=0; i<n; i++) {
-        if(p[i].waiting_time>9) printf(" ");
-        printf("%d", p[i].waiting_time);
-        if(p[i+1].waiting_time>9){
-          minus = 1;
-        }
-        if(i+1 == n )  if (last>9) minus = 1;
-        for(j=0; j<p[i].burst_time-minus; j++) printf("  ");
-
-    }
-    if(last>9) printf(" ");
-    printf("%d\n", last);
 }
 void sortForSJF(struct processes *p, int np)
 {
